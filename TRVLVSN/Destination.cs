@@ -12,6 +12,8 @@ namespace TRVLVSN
 		public DateTime ArrivalDate { get; set; }
 		public DateTime DepartureDate { get; set; }
 		public List<string> Activities { get; set; }
+		public double Latitude { get; set; }
+		public double Longitude { get; set; }
 
 		public Destination()
 		{

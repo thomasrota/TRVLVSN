@@ -78,7 +78,7 @@ namespace TRVLVSN
 			}
 		}
 
-		private void buttonMod_Click(object sender, EventArgs e)
+		private async void buttonMod_Click(object sender, EventArgs e)
 		{
 			string tripNameToEdit = textBoxOldName.Text;
 
@@ -87,11 +87,8 @@ namespace TRVLVSN
 			{
 				DateTime today = DateTime.Today;
 				bool datesValid = dateTimePickerModStartTrip.Value <= dateTimePickerModEndTrip.Value &&
-								  dateTimePickerModArriveDate.Value >= dateTimePickerModStartTrip.Value &&
-								  dateTimePickerModArriveDate.Value <= dateTimePickerModEndTrip.Value &&
-								  dateTimePickeModrDpartureDate.Value >= dateTimePickerModArriveDate.Value &&
-								  dateTimePickeModrDpartureDate.Value >= dateTimePickerModStartTrip.Value &&
-								  dateTimePickeModrDpartureDate.Value <= dateTimePickerModEndTrip.Value &&
+								  dateTimePickerModArriveDate.Value < dateTimePickerModEndTrip.Value &&
+								  dateTimePickeModrDpartureDate.Value < dateTimePickerModEndTrip.Value &&
 								  dateTimePickerModStartTrip.Value >= today &&
 								  dateTimePickerModEndTrip.Value >= today &&
 								  dateTimePickerModArriveDate.Value >= today &&
@@ -115,8 +112,20 @@ namespace TRVLVSN
 					destination.ArrivalDate = dateTimePickerModArriveDate.Value;
 					destination.DepartureDate = dateTimePickeModrDpartureDate.Value;
 					destination.Activities = new List<string>(textBoxModActivity.Text.Split(new[] { ';' }, StringSplitOptions.RemoveEmptyEntries));
+					// Ottieni le coordinate della destinazione
+					var coordinates = await GeocodingHelper.GetCoordinatesAsync(destination.Name);
+					if (coordinates.HasValue)
+					{
+						destination.Latitude = coordinates.Value.Latitude;
+						destination.Longitude = coordinates.Value.Longitude;
+					}
+					else
+					{
+						MessageBox.Show("Error: Unable to get coordinates for the destination.", "Geocoding Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
+						return;
+					}
 				}
-
+				ClearUI();
 				DisplayTrips();
 				JsonHelper.SaveToFile(FilePath, trips);
 				MessageBox.Show($"'{tripToEdit.TripName}' modificato con successo.", "Modificato correttamente", MessageBoxButtons.OK, MessageBoxIcon.Information);
@@ -161,6 +170,14 @@ namespace TRVLVSN
 					listViewModTrips.Items.Add(item);
 				}
 			}
+		}
+
+		private void ClearUI()
+		{
+			textBoxOldName.Text = string.Empty;
+			textBoxModTripName.Text = string.Empty;
+			textBoxModDestinationName.Text = string.Empty;
+			textBoxModActivity.Text = string.Empty;
 		}
 	}
 }

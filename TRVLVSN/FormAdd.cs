@@ -29,15 +29,12 @@ namespace TRVLVSN
 			}
 		}
 
-		private void buttonAdd_Click(object sender, EventArgs e)
+		private async void buttonAdd_Click(object sender, EventArgs e)
 		{
 			DateTime today = DateTime.Today;
 			bool datesValid = dateTimePickerStartTrip.Value <= dateTimePickerEndTrip.Value &&
-			                  dateTimePickerArriveDate.Value >= dateTimePickerStartTrip.Value &&
-			                  dateTimePickerArriveDate.Value <= dateTimePickerEndTrip.Value &&
-			                  dateTimePickerDpartureDate.Value <= dateTimePickerArriveDate.Value &&
-							  dateTimePickerDpartureDate.Value >= dateTimePickerStartTrip.Value &&
-			                  dateTimePickerDpartureDate.Value <= dateTimePickerEndTrip.Value &&
+			                  dateTimePickerArriveDate.Value < dateTimePickerEndTrip.Value &&
+			                  dateTimePickerDpartureDate.Value < dateTimePickerEndTrip.Value &&
 			                  dateTimePickerStartTrip.Value >= today &&
 			                  dateTimePickerEndTrip.Value >= today &&
 			                  dateTimePickerArriveDate.Value >= today &&
@@ -46,6 +43,14 @@ namespace TRVLVSN
 			if (!datesValid)
 			{
 				MessageBox.Show("Assicurati che le date siano inserite correttamente.", "Errore", MessageBoxButtons.OK, MessageBoxIcon.Error);
+				return;
+			}
+
+			var coordinates = await GeocodingHelper.GetCoordinatesAsync(textBoxDestinationName.Text);
+			if (!coordinates.HasValue)
+			{
+				MessageBox.Show("Impossibile ricavare le coordinate della destinazione.", "Errore di Geolocalizzazione", MessageBoxButtons.OK, MessageBoxIcon.Error);
+				textBoxDestinationName.Text = string.Empty;
 				return;
 			}
 
@@ -61,7 +66,9 @@ namespace TRVLVSN
 				Name = textBoxDestinationName.Text,
 				ArrivalDate = dateTimePickerArriveDate.Value,
 				DepartureDate = dateTimePickerDpartureDate.Value,
-				Activities = new List<string>(textBoxAddActivity.Text.Split(new[] { ';' }, StringSplitOptions.RemoveEmptyEntries))
+				Activities = new List<string>(textBoxAddActivity.Text.Split(new[] { ';' }, StringSplitOptions.RemoveEmptyEntries)),
+				Latitude = coordinates.Value.Latitude,
+				Longitude = coordinates.Value.Longitude
 			};
 
 			trip.AddDestination(destination);
