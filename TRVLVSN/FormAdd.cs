@@ -136,7 +136,11 @@ namespace TRVLVSN
 		private void DisplayTrips()
 		{
 			listViewAddedTrips.Items.Clear();
-			foreach (var trip in trips)
+			DateTime today = DateTime.Today;
+
+			var futureTrips = trips.Where(trip => trip.EndDate >= today).ToList();
+
+			foreach (var trip in futureTrips)
 			{
 				foreach (var destination in trip.Destinations)
 				{
@@ -146,7 +150,7 @@ namespace TRVLVSN
 					item.SubItems.Add(destination.Name);
 					item.SubItems.Add(destination.DepartureDate.ToString("dd/MM/yyyy"));
 					item.SubItems.Add(destination.ArrivalDate.ToString("dd/MM/yyyy"));
-					item.SubItems.Add(string.Join(", ", destination.Activities));
+					item.SubItems.Add(string.Join("; ", destination.Activities));
 
 					listViewAddedTrips.Items.Add(item);
 				}

@@ -114,6 +114,7 @@
 			this.buttonModify.TabIndex = 3;
 			this.buttonModify.Text = "Modifica Viaggio";
 			this.buttonModify.UseVisualStyleBackColor = true;
+			this.buttonModify.Click += new System.EventHandler(this.buttonModify_Click);
 			// 
 			// buttonAddTrip
 			// 

@@ -30,6 +30,12 @@ namespace TRVLVSN
 			labelTit.Text += "Elimina viaggio";
 			OpenFormInput<FormDelete>();
 		}
+		private void buttonModify_Click(object sender, EventArgs e)
+		{
+			CloseFormsInput();
+			labelTit.Text += "Modifica viaggio";
+			OpenFormInput<FormMod>();
+		}
 		#endregion
 		#region Funzioni servizio
 		// Funzione per aprire un form in un pannello
@@ -63,21 +69,6 @@ namespace TRVLVSN
 		       labelTit.Text = "";
 			}
 		}
-		/*
-		private void DisplayTrips()
-		{
-			dgvTrips.Rows.Clear();
-			foreach (var trip in trips)
-			{
-				foreach (var destination in trip.Destinations)
-				{
-					dgvTrips.Rows.Add(trip.TripName, trip.StartDate, trip.EndDate,
-						destination.Name, destination.Description,
-						destination.ArrivalDate, destination.DepartureDate,
-						string.Join(", ", destination.Activities));
-				}
-			}
-		}*/
 		#endregion
 	}
 }
